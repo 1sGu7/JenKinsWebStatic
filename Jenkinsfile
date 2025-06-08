@@ -3,29 +3,30 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/1sGu7/JenKinsWebStatic.git'
+                git url: 'https://github.com/1sGu7/JenKinsWebStatic.git', branch: 'main'
             }
         }
         stage('Build Docker Image') {
             steps {
                 script {
-                    def dockerImage = docker.build("my-image:latest")
-                    // Các bước khác nếu cần, ví dụ: push image
+                    sh 'DOCKER_BUILDKIT=1 docker build -t my-image:latest .'
                 }
             }
         }
         stage('Stop Existing Container') {
             steps {
                 script {
-                    sh 'docker stop my-container || true'
-                    sh 'docker rm my-container || true'
+                    sh '''
+                        docker ps -q --filter "name=my-container" | xargs -r docker stop || true
+                        docker ps -a -q --filter "name=my-container" | xargs -r docker rm || true
+                    '''
                 }
             }
         }
         stage('Run Docker Container') {
             steps {
                 script {
-                    docker.image("my-image:latest").run("-p 8080:80 --name my-container")
+                    sh 'docker run -d -p 8081:80 --name my-container my-image:latest'
                 }
             }
         }
