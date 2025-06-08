@@ -3,7 +3,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/1sGu7/JenKinsWebStatic.git'
+                git branch: 'main',
+            url: 'https://github.com/1sGu7/JenKinsWebStatic.git'
             }
         }
         stage('Build Docker Image') {
