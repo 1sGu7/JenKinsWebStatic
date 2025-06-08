@@ -9,13 +9,15 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("my-profile-web:latest")
+                    // Build Docker image từ thư mục chứa Dockerfile (nếu Dockerfile ở root repo thì không cần tham số thứ hai)
+                    def customImage = docker.build("my-profile-web:latest")
                 }
             }
         }
         stage('Stop Existing Container') {
             steps {
                 script {
+                    // Dừng và xóa container cũ nếu có
                     sh 'docker rm -f my-profile-web-container || true'
                 }
             }
@@ -23,7 +25,8 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-                    docker.image("my-profile-web:latest").run("-d -p 80:80 --name my-profile-web-container")
+                    // Chạy container mới, tách tham số rõ ràng
+                    docker.image("my-profile-web:latest").run("-d", "-p", "80:80", "--name", "my-profile-web-container")
                 }
             }
         }
